@@ -3,10 +3,10 @@ from PIL import Image, ImageDraw, ImageFont
 import json
 from datetime import datetime, timedelta
 import db
-import os
+import config
 
-url = os.getenv("URL")
-main_data = os.getenv("MAIN_DATA")
+url = config.url
+main_data = config.main_data
 
 # Function to get managers from main data
 def get_managers():
@@ -27,10 +27,12 @@ def send_telegram_message(chat_id, message, token):
     requests.post(url, data=data)
 
 # Function to send Telegram photo
-def send_telegram_photo(chat_id, photo, token):
+def send_telegram_photo(chat_id, photo, token, keyboard=None, image_caption=None):
     url = f"https://api.telegram.org/bot{token}/sendPhoto"
     data = {"chat_id": chat_id}
-    files = {"photo": photo}
+    files = {"photo": photo,
+             'caption': (None, image_caption),
+             'reply_markup': (None, keyboard)}
     response = requests.post(url, data=data, files=files)
     return response
 

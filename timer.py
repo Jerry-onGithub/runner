@@ -6,12 +6,14 @@ import config
 import db
 import helper as h
 import os
+import json
 
-u_token = config.UBOT
-ad_token = config.ADBOT
 
-promo_items = os.getenv("PROMO_ITEMS_URL")
-search_list = os.getenv("SEARCH_LIST_URL")
+u_token = config.ubot
+ad_token = config.adbot
+
+promo_items = config.url
+search_list = config.main_data
 
 
 # Function to check and notify subscribed users about promo start
@@ -60,8 +62,9 @@ def send_final_report_to_admins():
         if datetime.now() >= end_time:
             orders = h.get_orders(starting_time, end_time)
             final_report = h.generate_report(orders)
+            keyboard=json.dumps({ "inline_keyboard": [ [ {"text": 'Approve', "callback_data": f'decision_promo_{item['Id']}_yes'} ], [ {"text": 'Cancel', "callback_data": f'decision_promo_{item['Id']}_no'} ] ] })
             for manager in h.managers:
-                h.send_telegram_photo(manager, final_report, ad_token)
+                h.send_telegram_photo(manager, final_report, ad_token, keyboard, 'Final Report - Promo Ended')
 
 # Function to send progress report to admins every x hours within a promo duration
 def send_progress_report_to_admins():
@@ -75,7 +78,7 @@ def send_progress_report_to_admins():
             progress_report = h.generate_report(orders)
             #generate an image for progress_report containing report_items
             for manager in h.managers:
-                h.send_telegram_photo(manager, progress_report, ad_token)
+                h.send_telegram_photo(manager, progress_report, ad_token, image_caption='Promo Progress Report')
 
 # Function to reset promo items every 24 hours
 def reset_promo_items():
