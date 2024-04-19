@@ -5,7 +5,6 @@ import time
 import config
 import db
 import helper as h
-import os
 import json
 
 
